@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 import datetime as dt
 from sqlalchemy.ext.automap import automap_base
+import os
 
 #################################################
 # Database Setup
@@ -12,7 +13,7 @@ from sqlalchemy.ext.automap import automap_base
 
 
 # reflect an existing database into a new model
-engine = create_engine(r"sqlite:///C:\Users\qwert\Documents\GitHub\sqlalchemy-challenge\Resources\hawaii.sqlite")
+engine = create_engine("sqlite:///../Resources/hawaii.sqlite")
 hawaii_cxn = engine.connect()
 # Save references to each table
 
@@ -121,3 +122,4 @@ def start_end(start, end):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
