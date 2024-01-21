@@ -54,15 +54,13 @@ app = Flask(__name__)
 
 @app.route("/")
 def index(): 
-        return """
-    Welcome to the Weather App!
-    Directory:
-    - /api/v1.0/precipitation: Return JSON of the last 12 months of precipitation data from the latest date
-    - /api/v1.0/stations: Return JSON list of stations
-    - /api/v1.0/tobs: Return JSON list of temperature observations from the most active station
-    - /api/v1.0/<start>: Return a JSON list of the minimum temperature, average temperature, and the maximum temperature from a specified start date
-    - /api/v1.0/<start>/<end>: Return a JSON list of the minimum temperature, average temperature, and the maximum temperature from a specified start and end date
-    """
+    return ("Welcome to the Weather App!<br>"
+    "Directory:<br>"
+    "- /api/v1.0/precipitation: Return JSON of the last 12 months of precipitation data from the latest date<br>"
+    "- /api/v1.0/stations: Return JSON list of stations<br>"
+    "- /api/v1.0/tobs: Return JSON list of temperature observations from the most active station<br>"
+    "- /api/v1.0/YYYY-MM-DD: Return a JSON list of the minimum temperature, average temperature, and the maximum temperature from a specified start date in the address bar in place of YYYY-MM-DD<br>"
+    "- /api/v1.0/YYYY-MM-DD/YYYY-MM-DD: Return a JSON list of the minimum temperature, average temperature, and the maximum temperature from a specified start and end date in the address bar in place of YYYY-MM-DD<br>")
 
 @app.route("/api/v1.0/precipitation")
 def precp(): 
@@ -73,9 +71,9 @@ def station():
 @app.route("/api/v1.0/tobs")
 def active(): 
     return(jsonify(most_active_station_stats))
+
 @app.route("/api/v1.0/<start>", methods=['GET'])
-def start(): 
-    start_date = request.arg.get('start_date')
+def start(start):  
 
     stats = session.query(
         func.min(measurement_table.tobs),
@@ -83,24 +81,21 @@ def start():
         func.avg(measurement_table.tobs)
     )
 
-    if start_date:
-        stats= query.filter(measurement.date >= start_date)
+    if start:
+        stats = stats.filter(measurement_table.date >= start)
 
     result = stats.first()
     
     temperature_data = {
-        'start_date': start_date,
-        'min_temperature': result.min_temp,
-        'max_temperature': result.max_temp,
-        'avg_temperature': result.avg_temp
+        'min_temperature': result[0],  
+        'max_temperature': result[1],
+        'avg_temperature': round(result[2])
     }
 
     return jsonify(temperature_data)
     
-@app.route("/api/v1.0/<start>/<end>")
-def startend(): 
-    start_date = request.arg.get('start_date')
-    end_date = request.arg.get('end_date')
+@app.route("/api/v1.0/<start>/<end>", methods=['GET'])
+def start_end(start, end):  
 
     stats = session.query(
         func.min(measurement_table.tobs),
@@ -108,20 +103,19 @@ def startend():
         func.avg(measurement_table.tobs)
     )
 
-    if start_date:
-        stats= stats.filter(measurement.date >= start_date)
-    if end_date:
-        stats = stats.filter(measurement.date <= end_date)
-    
+    if start:
+        stats = stats.filter(measurement_table.date >= start)
+    if end:
+        stats = stats.filter(measurement_table.date <= end)
+
     result = stats.first()
     
     temperature_data = {
-        'start_date': start_date,
-        'end_date': end_date,
-        'min_temperature': result.min_temp,
-        'max_temperature': result.max_temp,
-        'avg_temperature': result.avg_temp
+        'min_temperature': result[0],  
+        'max_temperature': result[1],
+        'avg_temperature': round(result[2])
     }
+
 
     return jsonify(temperature_data)
 
