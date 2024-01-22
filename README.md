@@ -30,6 +30,8 @@ The project is organized as follows:
    
 3. Open VSCode and run the application, clicking on the link generated
 
+   **NOTE: If the app.py is not working, please try right clicking in the folder and selecting "Open With Code" to ensure you are running in the correct directory.**
+
 ## API Endpoints
 
 /: Welcome page providing a directory of available API endpoints.
